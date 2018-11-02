@@ -10,6 +10,15 @@ final class ChatController: Service {
         let newSession = ChatSession(socket: socket)
         let uuid = newSession.identity.id
 
+        socket.eventLoop.scheduleRepeatedTask(initialDelay: .seconds(15), delay: .seconds(30)) { task -> Void in
+            guard !socket.isClosed else {
+                task.cancel()
+                return
+            }
+
+            socket.send(raw: UUID().uuidString, opcode: .ping)
+        }
+        
         socket.onClose.whenSuccess {
             self.writeLocked {
                 guard let finalSession = self.sessions.removeValue(forKey: uuid) else {
