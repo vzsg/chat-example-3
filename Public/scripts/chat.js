@@ -36,10 +36,10 @@ function Chat(host, secure) {
             chat.bubble(event.message.text, event.message.sender, new Date(event.message.timestamp));
             break
         case "connect":
-            chat.systemMessage(event.user.name + " just connected. Say hi!");
+            chat.systemMessage("**" + event.user.name + "** just connected. Say hi!");
             break
         case "disconnect":
-            chat.systemMessage(event.user.name + " has just left.");
+            chat.systemMessage("**" + event.user.name + "** has just left.");
             break
         case "notice":
             chat.systemMessage(event.message);

@@ -98,6 +98,8 @@ body {
     margin-block-end: 0;
     margin-top: 0;
     margin-bottom: 0; }
+.messages .message strong {
+    font-weight: bold; }
 .messages .message .timestamp {
     position: absolute;
     bottom: -15px;

@@ -98,7 +98,7 @@ final class ChatController: Service {
         }
         
         guard !reserved.contains(name.lowercased()) else {
-            session.send(.error("Oops! The name '\(name)' is reserved. Try again with a different name."))
+            session.send(.error("Oops! The name **\(name)** is reserved. Try again with a different name."))
             return
         }
 
@@ -106,17 +106,17 @@ final class ChatController: Service {
             let sameName = self.sessions.values.first(where: { $0.identity.name?.lowercased() == name.lowercased() })
 
             guard sameName == nil || sameName?.identity.id == session.identity.id else {
-                session.send(.error("The name '\(name)' is already in use.  \nTry again with a different name."))
+                session.send(.error("The name **\(name)** is already in use.  \nTry again with a different name."))
                 return
             }
 
             if let oldName = session.identity.name {
                 session.identity.name = name
-                session.send(.notice("You are now seen as '\(name)'."))
-                self.multicast(.notice("'\(oldName)' is now '\(name)'"), to: self.sessions, excluding: session)
+                session.send(.notice("You are now seen as **\(name)**."))
+                self.multicast(.notice("~~\(oldName)~~ is now **\(name)**"), to: self.sessions, excluding: session)
             } else {
                 session.identity.name = name
-                session.send(.notice("You are now seen as '\(name)'. Welcome!"))
+                session.send(.notice("You are now seen as **\(name)**.  \nWelcome!"))
                 self.multicast(.connect(session.identity), to: self.sessions, excluding: session)
             }
         }
