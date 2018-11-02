@@ -7,10 +7,6 @@ function Chat(host, secure) {
     chat.imageCache = {};
     chat.ws = new WebSocket(protocol + host + '/chat');
 
-    chat.ws.onopen = function() {
-        chat.systemMessage("You are now connected.")
-    };
-
     chat.ws.onclose = function() {
         chat.systemMessage("You have been disconnected from the chat room.")
     }
