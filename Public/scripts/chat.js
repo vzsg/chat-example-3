@@ -1,10 +1,11 @@
-function Chat(host) {
+function Chat(host, secure) {
     var defaultAvatar = 'https://avatars3.githubusercontent.com/u/17364220?v=3&s=200';
     var markdown = new showdown.Converter();
     var chat = this;
-    chat.imageCache = {};
+    var protocol = secure ? 'wss://' : 'ws:/'
 
-    chat.ws = new WebSocket('ws://' + host);
+    chat.imageCache = {};
+    chat.ws = new WebSocket(protocol + host + '/chat');
 
     chat.ws.onopen = function() {
         chat.systemMessage("You are now connected.")

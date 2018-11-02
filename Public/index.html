@@ -43,7 +43,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.7/showdown.min.js"></script>
         <script src="scripts/chat.js"></script>
         <script>
-            var chat = new Chat(window.location.host + "/chat");
+            var chat = new Chat(window.location.host, window.location.protocol === 'https:');
         </script>
     </body>
 </html>
