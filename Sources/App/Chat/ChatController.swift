@@ -37,7 +37,17 @@ final class ChatController: Service {
         socket.onText { _, text in self.dispatch(session: newSession, text: text) }
 
         writeLocked {
-            newSession.send(.notice("Welcome!  \nUse the `/nick` command to select your username."))
+            let users = self.connectedUsers()
+            let roster = users.isEmpty ? "just you" : users.joined(separator: ", ")
+            let welcome = """
+                          Welcome!  \n
+                            \n
+                          Use the `/nick` command to select your username.  \n
+                          Use the the `/list` command at any time to check who is online.
+                          """
+
+            newSession.send(.notice(welcome))
+            newSession.send(.notice("Currently online: " + roster))
             self.sessions.insert(newSession)
         }
     }
@@ -64,8 +74,8 @@ final class ChatController: Service {
             }
 
             updateIdentity(of: session, to: String(parts[1]))
-        case "/roster":
-            session.send(.error("Oops! The Roster is not yet implemented"))
+        case "/list":
+            sendRoster(to: session)
         default:
             session.send(.error("Oops! Invalid command: `\(command)`"))
         }
@@ -120,6 +130,28 @@ final class ChatController: Service {
                 self.multicast(.connect(session.identity), to: self.sessions, excluding: session)
             }
         }
+    }
+
+    private func sendRoster(to session: ChatSession) {
+        readLocked {
+            let users = self.connectedUsers()
+
+            let notice: String
+
+
+            if users.isEmpty {
+                notice = "Currently online: just you"
+            } else {
+                notice = "Currently online: \(users.joined(separator: ", "))"
+            }
+
+            session.send(.notice(notice))
+        }
+    }
+
+    private func connectedUsers() -> [String] {
+        return sessions.compactMap { $0.identity.name }
+            .sorted()
     }
 
     // MARK: - Outgoing message utilities
