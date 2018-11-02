@@ -3,7 +3,7 @@ import Dispatch
 
 final class ChatController: Service {
     private let queue = DispatchQueue(label: "chat_queue", attributes: .concurrent)
-    private var sessions: [UUID: ChatSession] = [:]
+    private var sessions = Set<ChatSession>()
 
     // MARK: - Connection handler (entry point)
     func onUpgrade(socket: WebSocket, request: Request) {
@@ -21,7 +21,7 @@ final class ChatController: Service {
         
         socket.onClose.whenSuccess {
             self.writeLocked {
-                guard let finalSession = self.sessions.removeValue(forKey: uuid) else {
+                guard let finalSession = self.sessions.first(where: { $0.identity.id == uuid }) else {
                     return
                 }
                 
@@ -38,7 +38,7 @@ final class ChatController: Service {
 
         writeLocked {
             newSession.send(.notice("Welcome!  \nUse the `/nick` command to select your username."))
-            self.sessions[uuid] = newSession
+            self.sessions.insert(newSession)
         }
     }
 
@@ -103,7 +103,7 @@ final class ChatController: Service {
         }
 
         writeLocked {
-            let sameName = self.sessions.values.first(where: { $0.identity.name?.lowercased() == name.lowercased() })
+            let sameName = self.sessions.first(where: { $0.identity.name?.lowercased() == name.lowercased() })
 
             guard sameName == nil || sameName?.identity.id == session.identity.id else {
                 session.send(.error("The name **\(name)** is already in use.  \nTry again with a different name."))
@@ -123,13 +123,13 @@ final class ChatController: Service {
     }
 
     // MARK: - Outgoing message utilities
-    private func multicast(_ event: ChatOutgoingEvent, to sessions: [UUID: ChatSession], excluding sender: ChatSession) {
-        let otherSessions = sessions.filter { $0.key != sender.identity.id }
+    private func multicast(_ event: ChatOutgoingEvent, to sessions: Set<ChatSession>, excluding sender: ChatSession) {
+        let otherSessions = sessions.filter { $0.identity.id != sender.identity.id }
         multicast(event, to: otherSessions)
     }
 
-    private func multicast(_ event: ChatOutgoingEvent, to sessions: [UUID: ChatSession]) {
-        sessions.values.forEach { $0.send(event) }
+    private func multicast(_ event: ChatOutgoingEvent, to sessions: Set<ChatSession>) {
+        sessions.forEach { $0.send(event) }
     }
 
     // MARK: - Thread safe access to the session list
