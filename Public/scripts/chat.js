@@ -57,7 +57,7 @@ function Chat(host, secure) {
             chat.bubble(message);
         }
     }
-    
+
     chat.bubble = function(message, sender, timestamp) {
         var d = timestamp || new Date();
         var message = markdown.makeHtml(message);
@@ -65,27 +65,29 @@ function Chat(host, secure) {
         var bubble = $('<div>')
             .addClass('message')
             .addClass('new');
-        
-        if (sender) {
+
+        var text = $('<span>')
+            .addClass('text');
+
+        if (sender === true) {
+            // System message
+            bubble.addClass('system');
+            text.html(message);
+        } else if (sender) {
             bubble.attr('data-username', sender.name);
 
             var image = $('<img>')
             .addClass('avatar')
             .attr('src', sender.avatar || defaultAvatar);
-            
+
             bubble.append(image);
-        }
-        
-        var text = $('<span>')
-            .addClass('text');
-        
-        if (sender) {
             text.html(sender.name + ': ' + message);
         } else {
+            // Outgoing message
             bubble.addClass('personal');
             text.html(message);
         }
-        
+
         bubble.append(text);
 
         var m = '00'
@@ -107,6 +109,6 @@ function Chat(host, secure) {
     }
 
     chat.systemMessage = function(message) {
-        chat.bubble(message, { name: 'System', avatar: defaultAvatar })
+        chat.bubble(message, true)
     }
 };
