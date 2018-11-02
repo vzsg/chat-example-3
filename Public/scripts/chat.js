@@ -105,10 +105,6 @@ function Chat(host, secure) {
         var objDiv = $('.messages')[0];
         objDiv.scrollTop = objDiv.scrollHeight;
     }
-    
-    chat.join = function(name) {
-        chat.ws.send("/ident " + name);
-    }
 
     chat.systemMessage = function(message) {
         chat.bubble(message, { name: 'System', avatar: defaultAvatar })

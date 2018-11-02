@@ -37,7 +37,7 @@ final class ChatController: Service {
         socket.onText { _, text in self.dispatch(session: newSession, text: text) }
 
         writeLocked {
-            newSession.send(.notice("Welcome back! Use the `/ident` command to select your username."))
+            newSession.send(.notice("Welcome!  \nUse the `/nick` command to select your username."))
             self.sessions[uuid] = newSession
         }
     }
@@ -57,9 +57,9 @@ final class ChatController: Service {
         }
 
         switch command {
-        case "/ident":
+        case "/nick":
             guard parts.count == 2 else {
-                session.send(.error("Oops! Invalid number of arguments.  \nSyntax:  \n`/ident username`"))
+                session.send(.error("Oops! Invalid number of arguments.  \nSyntax:  \n`/nick username`"))
                 return
             }
 
@@ -74,7 +74,7 @@ final class ChatController: Service {
     private func dispatchMessage(_ text: String, by session: ChatSession) {
         readLocked {
             guard session.identity.name != nil else {
-                session.send(.error("Oops! You need to select a username before joining the conversation.  \nTry using the `/ident` command to select a unique username."))
+                session.send(.error("Oops! You need to select a username before joining the conversation.  \nTry using the `/nick` command to select a unique username."))
                 return
             }
 
