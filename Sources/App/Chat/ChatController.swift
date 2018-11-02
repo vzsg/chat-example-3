@@ -43,7 +43,7 @@ final class ChatController: Service {
                           Welcome!  \n
                             \n
                           Use the `/nick` command to select your username.  \n
-                          Use the the `/list` command at any time to check who is online.
+                          Use the `/list` command at any time to check who is online.
                           """
 
             newSession.send(.notice(welcome))
